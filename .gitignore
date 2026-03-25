@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Rust
+**/target/
+**/*.rs.bk
+
+# Swift / Xcode / SwiftPM
+.build/
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+*.xcuserstate
+
+# IDE / Editor
+.idea/
+.vscode/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Local environment files
+.env
+.env.*
+!.env.example

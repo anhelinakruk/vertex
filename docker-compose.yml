@@ -1,0 +1,52 @@
+services:
+  surrealdb:
+    container_name: vertex-surrealdb
+    hostname: surrealdb
+    build:
+      context: .
+      dockerfile: ./surrealdb.Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - surrealdb-data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "surreal",
+          "sql",
+          "--conn",
+          "http://127.0.0.1:8000",
+          "--user",
+          "${SURREAL_USER:-root}",
+          "--pass",
+          "${SURREAL_PASS:-root}",
+          "--ns",
+          "${SURREALDB_NAMESPACE:-vertex}",
+          "--db",
+          "${SURREALDB_DATABASE:-vertex}",
+          "RETURN 1;",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  backend:
+    container_name: vertex-server
+    hostname: backend
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      surrealdb:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+volumes:
+  surrealdb-data:
