@@ -1,0 +1,9 @@
+# Ignore backend build artifacts
+server/target/
+
+# Ignore git
+.git/
+
+# Keep only what we need
+!fixtures/
+!surrealdb.Dockerfile
