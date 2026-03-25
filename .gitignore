@@ -1,5 +1,6 @@
 # macOS
 .DS_Store
+**/.DS_Store
 
 # Rust
 **/target/
@@ -8,9 +9,24 @@
 # Swift / Xcode / SwiftPM
 .build/
 DerivedData/
-*.xcworkspace/xcuserdata/
+xcuserdata/
 *.xcuserdatad/
 *.xcuserstate
+xcschememanagement.plist
+*.xcworkspace/xcuserdata/
+Pods/
+.swiftpm/
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# iOS signing — never commit these
+*.mobileprovision
+*.p12
+*.cer
+
+# Docker local overrides
+docker-compose.override.yml
 
 # IDE / Editor
 .idea/
