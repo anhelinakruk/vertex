@@ -20,3 +20,8 @@ DerivedData/
 *.log
 *.tmp
 *.swp
+
+# Local environment files
+.env
+.env.*
+!.env.example
