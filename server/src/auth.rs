@@ -139,3 +139,14 @@ impl FromRequestParts<()> for Claims {
         Err(AuthError::MissingCredentials)
     }
 }
+
+pub fn extract_nonce_from_message(message: &str) -> Option<String> {
+    // SIWE message format includes "nonce" field
+    // Example: "I accept the MetaMask Terms of Service: https://community.metamask.io/tos\n\nURI: ...\nnonce: abc123..."
+    for line in message.lines() {
+        if let Some(nonce) = line.strip_prefix("nonce:") {
+            return Some(nonce.trim().to_string());
+        }
+    }
+    None
+}
