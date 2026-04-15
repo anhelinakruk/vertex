@@ -1,5 +1,5 @@
 //
-//  WelcomeView.swift
+//  WalletViewModel.swift
 //  Vertex
 //
 //  Created by Daria Kozlovska on 13/04/2026.
@@ -251,17 +251,17 @@ class WalletViewModel: ObservableObject {
             return
         }
 
-        print("📍 Fetching transactions for address: \(address)")
+        print("Fetching transactions for address: \(address)")
 
         do {
             let fetchedTransactions = try await AlchemyService.shared.getTransactions(address: address)
-            print("📍 Fetched \(fetchedTransactions.count) transactions from Alchemy")
+            print("Fetched \(fetchedTransactions.count) transactions from Alchemy")
             transactions = fetchedTransactions
 
             if fetchedTransactions.isEmpty {
-                print("⚠️ No transactions found for this address")
+                print("No transactions found for this address")
             } else {
-                print("✅ Transactions updated: \(fetchedTransactions.count)")
+                print("Transactions updated: \(fetchedTransactions.count)")
                 fetchedTransactions.forEach { tx in
                     print("  - \(tx.txHash.prefix(10))... (\(tx.amount) ETH)")
                 }
@@ -273,7 +273,7 @@ class WalletViewModel: ObservableObject {
                 print("Transaction fetch cancelled (this is OK)")
                 return
             }
-            print("❌ Failed to fetch transactions: \(error)")
+            print("Failed to fetch transactions: \(error)")
         }
     }
 
