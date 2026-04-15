@@ -1,5 +1,7 @@
 use axum::{
-    http::StatusCode,
+    async_trait,
+    extract::FromRequestParts,
+    http::{request::Parts, StatusCode},
     response::{IntoResponse, Response},
     Json,
 };
@@ -106,4 +108,34 @@ pub fn verify_jwt(token: String) -> Result<Claims, AppError> {
     )?;
 
     Ok(token_data.claims)
+}
+
+#[async_trait]
+impl FromRequestParts<()> for Claims {
+    type Rejection = AuthError;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &()) -> Result<Self, Self::Rejection> {
+        // Try Authorization: Bearer header first
+        if let Some(auth_header) = parts.headers.get("authorization") {
+            if let Ok(auth_str) = auth_header.to_str() {
+                if let Some(token) = auth_str.strip_prefix("Bearer ") {
+                    return verify_jwt(token.to_string()).map_err(|_| AuthError::InvalidToken);
+                }
+            }
+        }
+
+        // Try cookie next
+        if let Some(cookie_header) = parts.headers.get("cookie") {
+            if let Ok(cookie_str) = cookie_header.to_str() {
+                for cookie_pair in cookie_str.split(';') {
+                    let trimmed = cookie_pair.trim();
+                    if let Some(token) = trimmed.strip_prefix("token=") {
+                        return verify_jwt(token.to_string()).map_err(|_| AuthError::InvalidToken);
+                    }
+                }
+            }
+        }
+
+        Err(AuthError::MissingCredentials)
+    }
 }
