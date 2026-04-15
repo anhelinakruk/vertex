@@ -315,13 +315,17 @@ class WalletViewModel: ObservableObject {
         return value
     }
 
-    private func deleteFromKeychain(key: String) {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainService,
-            kSecAttrAccount as String: key
-        ]
+    // MARK: - Wallet Crypto Functions
 
-        SecItemDelete(query as CFDictionary)
+    private func generateMnemonic(bytes: Data) async throws -> String {
+        return try await AlloySwift.generateMnemonic(bytes: [UInt8](bytes))
+    }
+
+    private func deriveAddressFromMnemonic(mnemonic: String) async throws -> String {
+        return try await AlloySwift.deriveAddressFromMnemonic(mnemonic: mnemonic)
+    }
+
+    private func signMessage(mnemonic: String, message: String) async throws -> String {
+        return try await AlloySwift.signMessage(mnemonic: mnemonic, message: message)
     }
 }
