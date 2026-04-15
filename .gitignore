@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Rust
+**/target/
+**/*.rs.bk
+
+# Swift / Xcode / SwiftPM
+.build/
+DerivedData/
+xcuserdata/
+*.xcuserdatad/
+*.xcuserstate
+xcschememanagement.plist
+*.xcworkspace/xcuserdata/
+Pods/
+.swiftpm/
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# iOS signing — never commit these
+*.mobileprovision
+*.p12
+*.cer
+
+# Docker local overrides
+docker-compose.override.yml
+
+# IDE / Editor
+.idea/
+.vscode/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Local environment files
+.env
+.env.*
+!.env.example
