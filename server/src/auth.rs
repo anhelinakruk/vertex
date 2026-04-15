@@ -5,6 +5,8 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey};
+use chrono::Utc;
 
 #[derive(Debug)]
 pub struct AppError(pub anyhow::Error);
@@ -72,4 +74,36 @@ pub struct AuthResponse {
 pub struct Claims {
     pub exp: usize,
     pub sub: String,
+}
+
+fn get_jwt_secret() -> String {
+    std::env::var("JWT_SECRET").unwrap_or_else(|_| "dev-secret-key".to_string())
+}
+
+pub fn generate_jwt(user_id: String) -> Result<String, AppError> {
+    let exp = Utc::now()
+        .checked_add_signed(chrono::Duration::days(7))
+        .unwrap()
+        .timestamp() as usize;
+
+    let claims = Claims { exp, sub: user_id };
+    let secret = get_jwt_secret();
+    let token = encode(
+        &Header::default(),
+        &claims,
+        &EncodingKey::from_secret(secret.as_ref()),
+    )?;
+
+    Ok(token)
+}
+
+pub fn verify_jwt(token: String) -> Result<Claims, AppError> {
+    let secret = get_jwt_secret();
+    let token_data = decode::<Claims>(
+        &token,
+        &DecodingKey::from_secret(secret.as_ref()),
+        &Validation::default(),
+    )?;
+
+    Ok(token_data.claims)
 }
