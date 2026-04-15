@@ -1,24 +1,23 @@
 use axum::{routing::get, Router, Json, extract};
 use std::net::SocketAddr;
-use serde::{Deserialize, Serialize};
 use siwe::generate_nonce;
 
 mod db;
-use db::AppState;
+mod auth;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GenerateNonceResponse {
-    pub nonce: String,
-}
+use db::AppState;
+use auth::{AppError, GenerateNonceResponse};
 
 async fn health() -> &'static str {
     "ok"
 }
 
-async fn get_nonce(extract::State(state): extract::State<AppState>) -> Json<GenerateNonceResponse> {
+async fn get_nonce(
+    extract::State(state): extract::State<AppState>,
+) -> Result<Json<GenerateNonceResponse>, AppError> {
     let nonce = generate_nonce();
     state.save_nonce(&nonce).await;
-    Json(GenerateNonceResponse { nonce })
+    Ok(Json(GenerateNonceResponse { nonce }))
 }
 
 #[tokio::main]
