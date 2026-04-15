@@ -6,13 +6,45 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		231400D42F8D971F0045CA58 /* Alloy in Frameworks */ = {isa = PBXBuildFile; productRef = 231400D32F8D971F0045CA58 /* Alloy */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildRule section */
+		23CB48DD2F8D90790025D11B /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			fileType = file.bplist;
+			inputFiles = (
+			);
+			isEditable = 1;
+			outputFiles = (
+			);
+			script = "# builtin-copyPlist\n";
+		};
+/* End PBXBuildRule section */
+
 /* Begin PBXFileReference section */
 		2323D2E92F74932200D9B46F /* frontend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = frontend.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		231400CF2F8D93D50045CA58 /* Exceptions for "frontend" folder in "frontend" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+				Info.plist,
+			);
+			target = 2323D2E82F74932200D9B46F /* frontend */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2323D2EB2F74932200D9B46F /* frontend */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				231400CF2F8D93D50045CA58 /* Exceptions for "frontend" folder in "frontend" target */,
+			);
 			path = frontend;
 			sourceTree = "<group>";
 		};
@@ -23,6 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				231400D42F8D971F0045CA58 /* Alloy in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,6 +90,7 @@
 				2323D2E72F74932200D9B46F /* Resources */,
 			);
 			buildRules = (
+				23CB48DD2F8D90790025D11B /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
@@ -65,6 +99,7 @@
 			);
 			name = frontend;
 			packageProductDependencies = (
+				231400D32F8D971F0045CA58 /* Alloy */,
 			);
 			productName = frontend;
 			productReference = 2323D2E92F74932200D9B46F /* frontend.app */;
@@ -94,6 +129,9 @@
 			);
 			mainGroup = 2323D2E02F74932200D9B46F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				231400D22F8D971F0045CA58 /* XCRemoteSwiftPackageReference "Alloy" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2323D2EA2F74932200D9B46F /* Products */;
 			projectDirPath = "";
@@ -324,6 +362,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		231400D22F8D971F0045CA58 /* XCRemoteSwiftPackageReference "Alloy" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/s1ddok/Alloy.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.18.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		231400D32F8D971F0045CA58 /* Alloy */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 231400D22F8D971F0045CA58 /* XCRemoteSwiftPackageReference "Alloy" */;
+			productName = Alloy;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2323D2E12F74932200D9B46F /* Project object */;
 }
