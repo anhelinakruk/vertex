@@ -1,4 +1,4 @@
-FROM surrealdb/surrealdb:latest
+FROM surrealdb/surrealdb:v2.3.3
 
 COPY ./fixtures /fixtures
 
