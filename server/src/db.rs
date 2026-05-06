@@ -1,59 +1,121 @@
-use std::collections::HashMap;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use tokio::sync::Mutex;
-use uuid::Uuid;
-use chrono::Utc;
+use surrealdb::engine::remote::ws::{Client, Ws};
+use surrealdb::opt::auth::Root;
+use surrealdb::sql::Thing;
+use surrealdb::Surreal;
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct AppState {
-    pub nonces: Arc<Mutex<HashMap<String, String>>>,
-    pub users: Arc<Mutex<HashMap<String, User>>>,
-    pub wallets: Arc<Mutex<HashMap<String, String>>>,
+    pub database: Arc<Surreal<Client>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct User {
-    pub id: Option<String>,
+    pub id: Option<Thing>,
     pub address: String,
     pub created_at: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Wallet {
+    pub id: Option<Thing>,
+    pub user_id: String,
+    pub address: String,
+    pub created_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Nonce {
+    pub id: Option<Thing>,
+    pub value: String,
+    pub exp: Option<String>,
+    pub iat: Option<String>,
+}
+
 impl AppState {
-    pub async fn save_nonce(&self, nonce: &str) {
-        let mut nonces = self.nonces.lock().await;
-        nonces.insert(nonce.to_string(), Utc::now().timestamp().to_string());
+    pub async fn new(
+        address: &str,
+        username: &str,
+        password: &str,
+        namespace: &str,
+        database: &str,
+    ) -> Result<Self> {
+        let client = Surreal::new::<Ws>(address).await?;
+        client.signin(Root { username, password }).await?;
+        client.use_ns(namespace).use_db(database).await?;
+        Ok(AppState { database: Arc::new(client) })
     }
 
-    pub async fn get_nonce(&self, nonce: &str) -> Option<String> {
-        let mut nonces = self.nonces.lock().await;
-        nonces.remove(nonce)
+    pub async fn create_user(&self, address: &str) -> Result<User> {
+        let user: Option<User> = self
+            .database
+            .create("user")
+            .content(User {
+                id: None,
+                address: address.to_lowercase(),
+                created_at: None,
+            })
+            .await?;
+        user.ok_or_else(|| anyhow::anyhow!("Failed to create user"))
     }
 
-    pub async fn get_user_by_address(&self, address: &str) -> Option<User> {
-        let users = self.users.lock().await;
-        users.get(&address.to_lowercase()).cloned()
+    pub async fn get_user_by_address(&self, address: &str) -> Result<Option<User>> {
+        let mut result = self
+            .database
+            .query("SELECT * FROM user WHERE address = type::string(string::lowercase($address))")
+            .bind(("address", address.to_string()))
+            .await?;
+        let users: Vec<User> = result.take(0)?;
+        Ok(users.into_iter().next())
     }
 
-    pub async fn create_user(&self, address: &str) -> User {
-        let user = User {
-            id: Some(Uuid::new_v4().to_string()),
-            address: address.to_lowercase(),
-            created_at: Some(Utc::now().to_rfc3339()),
-        };
-        let mut users = self.users.lock().await;
-        users.insert(user.address.clone(), user.clone());
-        user
+    pub async fn save_nonce(&self, value: &str) -> Result<()> {
+        self.database
+            .query(
+                "DELETE nonce WHERE exp < time::now() RETURN BEFORE;
+                 CREATE ONLY nonce SET value = type::string($value), exp = time::now() + 5m, iat = time::now();",
+            )
+            .bind(("value", value.to_string()))
+            .await?;
+        Ok(())
     }
 
-    pub async fn get_wallet_by_address(&self, address: &str) -> Option<String> {
-        let wallets = self.wallets.lock().await;
-        wallets.get(&address.to_lowercase()).cloned()
+    pub async fn get_nonce(&self, value: &str) -> Result<Option<Nonce>> {
+        let mut result = self
+            .database
+            .query(
+                "DELETE nonce WHERE exp < time::now() RETURN BEFORE;
+                 SELECT * FROM nonce WHERE value = type::string($value);",
+            )
+            .bind(("value", value.to_string()))
+            .await?;
+        let nonces: Vec<Nonce> = result.take(1)?;
+        Ok(nonces.into_iter().next())
     }
 
-    pub async fn create_wallet(&self, user_id: &str, address: &str) -> String {
-        let wallet_id = Uuid::new_v4().to_string();
-        let mut wallets = self.wallets.lock().await;
-        wallets.insert(address.to_lowercase(), user_id.to_string());
-        wallet_id
+    pub async fn get_wallet_by_address(&self, address: String) -> Result<Option<Wallet>> {
+        let mut result = self
+            .database
+            .query("SELECT * FROM wallets WHERE address = $address")
+            .bind(("address", address))
+            .await?;
+        let wallets: Vec<Wallet> = result.take(0)?;
+        Ok(wallets.into_iter().next())
+    }
+
+    pub async fn create_wallet(&self, user_id: &str, address: &str) -> Result<Wallet> {
+        let wallet: Option<Wallet> = self
+            .database
+            .create("wallets")
+            .content(Wallet {
+                id: None,
+                user_id: user_id.to_string(),
+                address: address.to_string(),
+                created_at: None,
+            })
+            .await?;
+        Ok(wallet.unwrap())
     }
 }
