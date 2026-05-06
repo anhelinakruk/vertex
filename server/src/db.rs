@@ -118,4 +118,54 @@ impl AppState {
             .await?;
         Ok(wallet.unwrap())
     }
+
+    pub async fn save_transaction(
+        &self,
+        wallet_id: &str,
+        tx_hash: &str,
+        from_address: &str,
+        to_address: &str,
+        amount: &str,
+        chain_id: i64,
+    ) -> Result<Transaction> {
+        let transaction: Option<Transaction> = self
+            .database
+            .create("transactions")
+            .content(Transaction {
+                id: None,
+                wallet_id: wallet_id.to_string(),
+                tx_hash: tx_hash.to_string(),
+                from_address: from_address.to_string(),
+                to_address: to_address.to_string(),
+                amount: amount.to_string(),
+                status: "pending".to_string(),
+                chain_id,
+                created_at: None,
+            })
+            .await?;
+        transaction.ok_or_else(|| anyhow::anyhow!("Failed to save transaction"))
+    }
+
+    pub async fn get_transactions_by_wallet(&self, wallet_id: &str) -> Result<Vec<Transaction>> {
+        let mut result = self
+            .database
+            .query("SELECT * FROM transactions WHERE wallet_id = $wallet_id ORDER BY created_at DESC")
+            .bind(("wallet_id", wallet_id.to_string()))
+            .await?;
+        let transactions: Vec<Transaction> = result.take(0)?;
+        Ok(transactions)
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Transaction {
+    pub id: Option<Thing>,
+    pub wallet_id: String,
+    pub tx_hash: String,
+    pub from_address: String,
+    pub to_address: String,
+    pub amount: String,
+    pub status: String,
+    pub chain_id: i64,
+    pub created_at: Option<String>,
 }
