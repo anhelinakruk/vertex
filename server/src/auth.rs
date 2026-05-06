@@ -1,3 +1,4 @@
+use alloy::signers::Signature;
 use axum::{
     async_trait,
     extract::{FromRequestParts, State},
@@ -13,6 +14,7 @@ use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation}
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use siwe::generate_nonce;
+use std::str::FromStr;
 
 use crate::db::AppState;
 
@@ -152,7 +154,16 @@ pub async fn verify_and_login(
         .await?
         .ok_or_else(|| anyhow::anyhow!("Invalid or expired nonce"))?;
 
-    // TODO: verify ECDSA signature against address
+    let signature = Signature::from_str(&payload.signature)
+        .map_err(|_| anyhow::anyhow!("Invalid signature format"))?;
+
+    let recovered = signature
+        .recover_address_from_msg(&payload.message)
+        .map_err(|_| anyhow::anyhow!("Failed to recover address from signature"))?;
+
+    if recovered.to_string().to_lowercase() != payload.address.to_lowercase() {
+        return Err(anyhow::anyhow!("Signature verification failed").into());
+    }
 
     let user = match state.get_user_by_address(&payload.address).await? {
         Some(u) => u,
