@@ -215,8 +215,18 @@ class WalletViewModel: ObservableObject {
         accessToken = storedToken
         isAuthenticated = true
 
+        // Use cache if still fresh (TTL 5 min)
+        if let cached = CacheService.shared.load(for: storedAddress) {
+            balance = cached.balance
+            transactions = cached.transactions
+            initializing = false
+            return
+        }
+
+        // Cache expired or empty — fetch from API and save
         await fetchBalance()
         await fetchTransactions()
+        CacheService.shared.save(address: storedAddress, balance: balance, transactions: transactions)
 
         initializing = false
     }
@@ -280,6 +290,9 @@ class WalletViewModel: ObservableObject {
     func refreshData() async {
         await fetchBalance()
         await fetchTransactions()
+        if !address.isEmpty {
+            CacheService.shared.save(address: address, balance: balance, transactions: transactions)
+        }
     }
 
     private func saveToKeychain(key: String, value: String) {

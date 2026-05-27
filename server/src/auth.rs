@@ -12,11 +12,17 @@ use axum_extra::{
 };
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use siwe::generate_nonce;
 use std::str::FromStr;
 
 use crate::db::AppState;
+
+#[derive(Debug, Serialize)]
+pub struct ApiError {
+    pub code: u16,
+    pub message: String,
+    pub details: String,
+}
 
 #[derive(Debug)]
 pub struct AppError(pub anyhow::Error);
@@ -24,11 +30,12 @@ pub struct AppError(pub anyhow::Error);
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         eprintln!("Application error: {:?}", self.0);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(serde_json::json!({ "error": self.0.to_string() })),
-        )
-            .into_response()
+        let body = ApiError {
+            code: 500,
+            message: "Internal server error".to_string(),
+            details: self.0.to_string(),
+        };
+        (StatusCode::INTERNAL_SERVER_ERROR, Json(body)).into_response()
     }
 }
 
@@ -50,12 +57,19 @@ pub enum AuthError {
 
 impl IntoResponse for AuthError {
     fn into_response(self) -> Response {
-        let (status, message) = match self {
-            AuthError::MissingCredentials => (StatusCode::UNAUTHORIZED, "Missing credentials"),
+        let (status, details) = match self {
+            AuthError::MissingCredentials => {
+                (StatusCode::UNAUTHORIZED, "Missing or invalid authorization credentials")
+            }
             AuthError::InvalidToken => (StatusCode::UNAUTHORIZED, "Invalid token"),
-            AuthError::TokenExpired => (StatusCode::UNAUTHORIZED, "Token expired"),
+            AuthError::TokenExpired => (StatusCode::UNAUTHORIZED, "Token has expired"),
         };
-        (status, Json(json!({ "error": message }))).into_response()
+        let body = ApiError {
+            code: status.as_u16(),
+            message: "Unauthorized".to_string(),
+            details: details.to_string(),
+        };
+        (status, Json(body)).into_response()
     }
 }
 

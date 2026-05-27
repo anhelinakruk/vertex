@@ -8,6 +8,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use auth::ApiError;
 use db::AppState;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
@@ -80,7 +81,11 @@ async fn save_transaction(
         Ok(tx) => (StatusCode::CREATED, Json(tx)).into_response(),
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            Json(serde_json::json!({ "error": e.to_string() })),
+            Json(ApiError {
+                code: 500,
+                message: "Internal server error".to_string(),
+                details: e.to_string(),
+            }),
         )
             .into_response(),
     }
@@ -95,7 +100,11 @@ async fn get_transactions(
         Ok(txs) => (StatusCode::OK, Json(txs)).into_response(),
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            Json(serde_json::json!({ "error": e.to_string() })),
+            Json(ApiError {
+                code: 500,
+                message: "Internal server error".to_string(),
+                details: e.to_string(),
+            }),
         )
             .into_response(),
     }

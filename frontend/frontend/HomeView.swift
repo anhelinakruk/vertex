@@ -23,13 +23,10 @@ struct HomeView: View {
     @State private var showSendSheet = false
     @State private var showReceiveSheet = false
     @State private var selectedTransaction: Transaction?
+    @State private var isRefreshing = false
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color(.sRGB, red: 0.97, green: 0.97, blue: 0.98)
-                    .ignoresSafeArea()
-
+        NavigationStack {
                 ScrollView {
                     VStack(spacing: 20) {
                         BalanceCard(
@@ -83,7 +80,18 @@ struct HomeView: View {
                     }
                     .padding(.vertical, 20)
                 }
-            }
+                .background(
+                    Color(.sRGB, red: 0.97, green: 0.97, blue: 0.98)
+                        .ignoresSafeArea()
+                )
+                .refreshable {
+                    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                        Task { @MainActor in
+                            await viewModel.refreshData()
+                            continuation.resume()
+                        }
+                    }
+                }
             .navigationTitle("Wallet")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -106,6 +114,23 @@ struct HomeView: View {
                             .font(.title3)
                     }
                 }
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        guard !isRefreshing else { return }
+                        isRefreshing = true
+                        Task {
+                            await viewModel.refreshData()
+                            isRefreshing = false
+                        }
+                    }) {
+                        if isRefreshing {
+                            ProgressView()
+                        } else {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.title3)
+                        }
+                    }
+                }
             }
             .sheet(isPresented: $showRecoveryPhrase) {
                 RecoveryPhraseSheet(mnemonic: viewModel.mnemonic, isPresented: $showRecoveryPhrase)
@@ -126,9 +151,6 @@ struct HomeView: View {
                 }
             } message: {
                 Text("Make sure you have saved your recovery phrase before logging out!")
-            }
-            .refreshable {
-                await viewModel.refreshData()
             }
         }
     }
