@@ -6,13 +6,46 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5C4032852FABF464000E53C0 /* AlloySwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5C4032842FABF464000E53C0 /* AlloySwift */; };
+		5C4032882FABF629000E53C0 /* AlloySwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5C4032872FABF629000E53C0 /* AlloySwift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildRule section */
+		23CB48DD2F8D90790025D11B /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			fileType = file.bplist;
+			inputFiles = (
+			);
+			isEditable = 1;
+			outputFiles = (
+			);
+			script = "# builtin-copyPlist\n";
+		};
+/* End PBXBuildRule section */
+
 /* Begin PBXFileReference section */
 		2323D2E92F74932200D9B46F /* frontend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = frontend.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		231400CF2F8D93D50045CA58 /* Exceptions for "frontend" folder in "frontend" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+				Info.plist,
+			);
+			target = 2323D2E82F74932200D9B46F /* frontend */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2323D2EB2F74932200D9B46F /* frontend */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				231400CF2F8D93D50045CA58 /* Exceptions for "frontend" folder in "frontend" target */,
+			);
 			path = frontend;
 			sourceTree = "<group>";
 		};
@@ -23,6 +56,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C4032882FABF629000E53C0 /* AlloySwift in Frameworks */,
+				5C4032852FABF464000E53C0 /* AlloySwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,6 +92,7 @@
 				2323D2E72F74932200D9B46F /* Resources */,
 			);
 			buildRules = (
+				23CB48DD2F8D90790025D11B /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
@@ -65,6 +101,8 @@
 			);
 			name = frontend;
 			packageProductDependencies = (
+				5C4032842FABF464000E53C0 /* AlloySwift */,
+				5C4032872FABF629000E53C0 /* AlloySwift */,
 			);
 			productName = frontend;
 			productReference = 2323D2E92F74932200D9B46F /* frontend.app */;
@@ -94,6 +132,9 @@
 			);
 			mainGroup = 2323D2E02F74932200D9B46F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5C4032862FABF629000E53C0 /* XCLocalSwiftPackageReference "../../../visoft/alloy-swift/AlloySwift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2323D2EA2F74932200D9B46F /* Products */;
 			projectDirPath = "";
@@ -253,7 +294,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 645UJY698H;
+				DEVELOPMENT_TEAM = NRFZAB2MH6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -266,7 +307,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.daria.frontend;
+				PRODUCT_BUNDLE_IDENTIFIER = com.anhelina.frontend;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -281,7 +322,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 645UJY698H;
+				DEVELOPMENT_TEAM = NRFZAB2MH6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -294,7 +335,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.daria.frontend;
+				PRODUCT_BUNDLE_IDENTIFIER = com.anhelina.frontend;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -324,6 +365,24 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		5C4032862FABF629000E53C0 /* XCLocalSwiftPackageReference "../../../visoft/alloy-swift/AlloySwift" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../visoft/alloy-swift/AlloySwift";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5C4032842FABF464000E53C0 /* AlloySwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AlloySwift;
+		};
+		5C4032872FABF629000E53C0 /* AlloySwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AlloySwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2323D2E12F74932200D9B46F /* Project object */;
 }
