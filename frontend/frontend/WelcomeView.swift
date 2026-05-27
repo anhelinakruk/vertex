@@ -26,7 +26,7 @@ struct WelcomeView: View {
                         .font(.system(size: 70))
                         .foregroundColor(.black)
 
-                    Text("Swaply")
+                    Text("Vertex")
                         .font(.system(size: 44, weight: .bold))
                         .foregroundColor(.primary)
 

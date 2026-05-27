@@ -59,7 +59,7 @@ class WalletViewModel: ObservableObject {
             let siweMessage = SIWEMessage(
                 domain: "localhost",
                 address: walletAddress,
-                statement: "Sign in to Swaply Wallet",
+                statement: "Sign in to Vertex Wallet",
                 uri: "http://localhost:3000",
                 version: "1",
                 chainId: 11155111,
@@ -140,7 +140,7 @@ class WalletViewModel: ObservableObject {
             let siweMessage = SIWEMessage(
                 domain: "localhost",
                 address: walletAddress,
-                statement: "Sign in to Swaply Wallet",
+                statement: "Sign in to Vertex Wallet",
                 uri: "http://localhost:3000",
                 version: "1",
                 chainId: 11155111,

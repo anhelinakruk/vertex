@@ -23,7 +23,6 @@ struct HomeView: View {
     @State private var showSendSheet = false
     @State private var showReceiveSheet = false
     @State private var selectedTransaction: Transaction?
-    @State private var isRefreshing = false
 
     var body: some View {
         NavigationStack {
@@ -112,23 +111,6 @@ struct HomeView: View {
                     } label: {
                         Image(systemName: "ellipsis.circle")
                             .font(.title3)
-                    }
-                }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        guard !isRefreshing else { return }
-                        isRefreshing = true
-                        Task {
-                            await viewModel.refreshData()
-                            isRefreshing = false
-                        }
-                    }) {
-                        if isRefreshing {
-                            ProgressView()
-                        } else {
-                            Image(systemName: "arrow.clockwise")
-                                .font(.title3)
-                        }
                     }
                 }
             }
