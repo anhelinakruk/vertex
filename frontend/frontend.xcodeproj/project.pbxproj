@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		231400D42F8D971F0045CA58 /* Alloy in Frameworks */ = {isa = PBXBuildFile; productRef = 231400D32F8D971F0045CA58 /* Alloy */; };
+		5C4032852FABF464000E53C0 /* AlloySwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5C4032842FABF464000E53C0 /* AlloySwift */; };
+		5C4032882FABF629000E53C0 /* AlloySwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5C4032872FABF629000E53C0 /* AlloySwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -55,7 +56,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				231400D42F8D971F0045CA58 /* Alloy in Frameworks */,
+				5C4032882FABF629000E53C0 /* AlloySwift in Frameworks */,
+				5C4032852FABF464000E53C0 /* AlloySwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,7 +101,8 @@
 			);
 			name = frontend;
 			packageProductDependencies = (
-				231400D32F8D971F0045CA58 /* Alloy */,
+				5C4032842FABF464000E53C0 /* AlloySwift */,
+				5C4032872FABF629000E53C0 /* AlloySwift */,
 			);
 			productName = frontend;
 			productReference = 2323D2E92F74932200D9B46F /* frontend.app */;
@@ -130,7 +133,7 @@
 			mainGroup = 2323D2E02F74932200D9B46F;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				231400D22F8D971F0045CA58 /* XCRemoteSwiftPackageReference "Alloy" */,
+				5C4032862FABF629000E53C0 /* XCLocalSwiftPackageReference "../../../visoft/alloy-swift/AlloySwift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2323D2EA2F74932200D9B46F /* Products */;
@@ -291,7 +294,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 645UJY698H;
+				DEVELOPMENT_TEAM = NRFZAB2MH6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -304,7 +307,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.daria.frontend;
+				PRODUCT_BUNDLE_IDENTIFIER = com.anhelina.frontend;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -319,7 +322,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 645UJY698H;
+				DEVELOPMENT_TEAM = NRFZAB2MH6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -332,7 +335,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.daria.frontend;
+				PRODUCT_BUNDLE_IDENTIFIER = com.anhelina.frontend;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -363,22 +366,21 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		231400D22F8D971F0045CA58 /* XCRemoteSwiftPackageReference "Alloy" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/s1ddok/Alloy.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.18.2;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		5C4032862FABF629000E53C0 /* XCLocalSwiftPackageReference "../../../visoft/alloy-swift/AlloySwift" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../visoft/alloy-swift/AlloySwift";
 		};
-/* End XCRemoteSwiftPackageReference section */
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		231400D32F8D971F0045CA58 /* Alloy */ = {
+		5C4032842FABF464000E53C0 /* AlloySwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 231400D22F8D971F0045CA58 /* XCRemoteSwiftPackageReference "Alloy" */;
-			productName = Alloy;
+			productName = AlloySwift;
+		};
+		5C4032872FABF629000E53C0 /* AlloySwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AlloySwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

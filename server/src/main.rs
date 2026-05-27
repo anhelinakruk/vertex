@@ -1,79 +1,102 @@
-use axum::{routing::{get, post}, Router, Json, extract};
-use std::net::SocketAddr;
-use siwe::generate_nonce;
-
-mod db;
 mod auth;
+mod db;
 
+use axum::{
+    extract::{Json, Path, State},
+    http::StatusCode,
+    response::IntoResponse,
+    routing::{get, post},
+    Router,
+};
 use db::AppState;
-use auth::{AppError, GenerateNonceResponse, VerifySignatureRequest, AuthResponse, generate_jwt, extract_nonce_from_message};
+use serde::{Deserialize, Serialize};
+use std::net::SocketAddr;
+use tower_http::cors::CorsLayer;
+
+#[tokio::main]
+async fn main() {
+    dotenvy::dotenv().ok();
+
+    let db_address = std::env::var("SURREALDB_ADDRESS")
+        .unwrap_or_else(|_| "localhost:8000".to_string());
+    let namespace = std::env::var("SURREALDB_NAMESPACE")
+        .unwrap_or_else(|_| "vertex".to_string());
+    let database = std::env::var("SURREALDB_DATABASE")
+        .unwrap_or_else(|_| "wallet".to_string());
+    let user = std::env::var("SURREAL_USER")
+        .unwrap_or_else(|_| "root".to_string());
+    let pass = std::env::var("SURREAL_PASS")
+        .unwrap_or_else(|_| "root".to_string());
+
+    let app_state = AppState::new(&db_address, &user, &pass, &namespace, &database)
+        .await
+        .expect("Failed to connect to database");
+
+    let app = Router::new()
+        .route("/health", get(health))
+        .route("/api/auth/nonce", get(auth::get_nonce))
+        .route("/api/auth/verify", post(auth::verify_and_login))
+        .route("/api/transactions", post(save_transaction))
+        .route("/api/transactions/:wallet_id", get(get_transactions))
+        .layer(CorsLayer::permissive())
+        .with_state(app_state);
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    eprintln!("Server listening on {}", addr);
+    axum::serve(listener, app).await.unwrap();
+}
 
 async fn health() -> &'static str {
     "ok"
 }
 
-async fn get_nonce(
-    extract::State(state): extract::State<AppState>,
-) -> Result<Json<GenerateNonceResponse>, AppError> {
-    let nonce = generate_nonce();
-    state.save_nonce(&nonce).await;
-    Ok(Json(GenerateNonceResponse { nonce }))
+#[derive(Debug, Serialize, Deserialize)]
+struct SaveTransactionRequest {
+    wallet_id: String,
+    tx_hash: String,
+    from_address: String,
+    to_address: String,
+    amount: String,
+    chain_id: i64,
 }
 
-async fn verify_and_login(
-    extract::State(state): extract::State<AppState>,
-    Json(req): Json<VerifySignatureRequest>,
-) -> Result<Json<AuthResponse>, AppError> {
-    // Extract nonce from message
-    let nonce = extract_nonce_from_message(&req.message)
-        .ok_or_else(|| AppError(anyhow::anyhow!("Invalid message format")))?;
-
-    // Verify nonce exists and is not expired
-    let _stored_nonce = state
-        .get_nonce(&nonce)
+async fn save_transaction(
+    _claims: auth::Claims,
+    State(state): State<AppState>,
+    Json(payload): Json<SaveTransactionRequest>,
+) -> impl IntoResponse {
+    match state
+        .save_transaction(
+            &payload.wallet_id,
+            &payload.tx_hash,
+            &payload.from_address,
+            &payload.to_address,
+            &payload.amount,
+            payload.chain_id,
+        )
         .await
-        .ok_or_else(|| AppError(anyhow::anyhow!("Invalid or expired nonce")))?;
-
-    // Normalize address (lowercase)
-    let address = req.address.to_lowercase();
-
-    // Get or create user
-    let user = match state.get_user_by_address(&address).await {
-        Some(user) => user,
-        None => state.create_user(&address).await,
-    };
-
-    let user_id = user
-        .id
-        .clone()
-        .ok_or_else(|| AppError(anyhow::anyhow!("Failed to create user")))?;
-
-    // Generate JWT token
-    let token = generate_jwt(user_id.clone())?;
-
-    Ok(Json(AuthResponse {
-        access_token: token,
-        user_id,
-    }))
+    {
+        Ok(tx) => (StatusCode::CREATED, Json(tx)).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({ "error": e.to_string() })),
+        )
+            .into_response(),
+    }
 }
 
-#[tokio::main]
-async fn main() {
-    let state = AppState::default();
-    
-    let app = Router::new()
-        .route("/health", get(health))
-        .route("/api/auth/nonce", get(get_nonce))
-        .route("/api/auth/verify", post(verify_and_login))
-        .with_state(state);
-
-    let addr: SocketAddr = "127.0.0.1:3000"
-        .parse()
-        .expect("valid bind address");
-
-    let listener = tokio::net::TcpListener::bind(addr)
-        .await
-        .expect("bind server socket");
-
-    axum::serve(listener, app).await.expect("run server");
+async fn get_transactions(
+    _claims: auth::Claims,
+    State(state): State<AppState>,
+    Path(wallet_id): Path<String>,
+) -> impl IntoResponse {
+    match state.get_transactions_by_wallet(&wallet_id).await {
+        Ok(txs) => (StatusCode::OK, Json(txs)).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({ "error": e.to_string() })),
+        )
+            .into_response(),
+    }
 }
